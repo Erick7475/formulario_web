@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario y Calificación</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #097e74;
+    }
+
+    .navbar {
+      background-color: #333;
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+    }
+
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+    }
+
+    .navbar-item {
+      color: white;
+      text-decoration: none;
+      padding: 10px 15px;
+      transition: background-color 0.3s;
+      border-radius: 5px;
+      margin: 0 10px;
+    }
+
+    .navbar-item:hover {
+      background-color: #555;
+    }
+
+    #contenido-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      background-color: #fff;
+      border: 2px solid #333;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #botones {
+      margin-top: 20px;
+    }
+
+    #formulario-container,
+    #calificacion-container {
+      display: none;
+    }
+
+    #agregar-formulario {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 2px solid #333;
+      border-radius: 10px;
+      z-index: 1000;
+    }
+
+    .cerrar {
+      float: right;
+      cursor: pointer;
+    }
+
+    .pregunta,
+    .respuesta,
+    .ponderacion {
+      margin-bottom: 20px;
+    }
+
+    .pregunta label,
+    .respuesta label,
+    .ponderacion label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .pregunta textarea,
+    .respuesta input,
+    .ponderacion input {
+      width: calc(100% - 10px);
+      padding: 5px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+
+    .pregunta textarea {
+      height: 80px;
+    }
+
+    .ponderacion input {
+      width: 60px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #555;
+    }
+
+    .calificacion {
+      margin-top: 20px;
+      font-size: 24px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-container">
+    <a href="https://github.com/Erick7475" class="navbar-item" id="contacto">Contacto</a>
+    <a href="https://github.com/Erick7475" class="navbar-item" id="sobre-mi">Sobre mí</a>
+    <a href="index.html" class="navbar-item">Inicio</a>
+  </div>
+</nav>
+
+<div id="contenido-container">
+  <h1>Bienvenido/a</h1>
+  <div id="botones">
+    <button class="btn" onclick="mostrarFormulario()">Mostrar Formulario</button>
+    <button class="btn" onclick="mostrarCalificacion()">Mostrar Calificación</button>
+  </div>
+
+  <div id="formulario-container">
+    <h2>Ingresa tus preguntas:</h2>
+    <div id="preguntas"></div>
+    <button class="btn" onclick="abrirVentana()">Agregar Pregunta</button>
+    <button class="btn" onclick="agregarOtraPregunta()">Agregar Otra Pregunta</button>
+  </div>
+
+  <div id="calificacion-container">
+    <h2>Calificación:</h2>
+    <p id="puntuacion-total" class="calificacion"></p>
+    <button class="btn" onclick="volverACalificar()">Volver a Calificar</button>
+  </div>
+</div>
+
+<div id="agregar-formulario">
+  <span class="cerrar" onclick="cerrarVentana()">&times;</span>
+  <h2>Agregar Pregunta</h2>
+  <div class="pregunta">
+    <label for="pregunta">Pregunta:</label>
+    <textarea id="pregunta" class="pregunta-input" required></textarea>
+  </div>
+  <div class="respuesta">
+    <label for="respuesta">Respuesta:</label>
+    <input type="text" id="respuesta" class="respuesta-input" required>
+  </div>
+  <div class="ponderacion">
+    <label for="ponderacion">Ponderación:</label>
+    <input type="number" id="ponderacion" class="ponderacion-input" step="0.01">
+  </div>
+  <button class="btn" onclick="agregarPregunta()">Agregar</button>
+</div>
+
+<script>
+  let preguntas = [];
+
+  function abrirVentana() {
+    document.getElementById("agregar-formulario").style.display = "block";
+  }
+
+  function cerrarVentana() {
+    document.getElementById("agregar-formulario").style.display = "none";
+  }
+
+  function agregarPregunta() {
+    const pregunta = document.getElementById("pregunta").value;
+    const respuesta = document.getElementById("respuesta").value;
+    const ponderacion = parseFloat(document.getElementById("ponderacion").value) || 0;
+    preguntas.push({ pregunta, respuesta, ponderacion });
+    mostrarPreguntas();
+    cerrarVentana();
+  }
+
+  function agregarOtraPregunta() {
+    abrirVentana();
+  }
+
+  function mostrarPreguntas() {
+    const preguntasContainer = document.getElementById("preguntas");
+    preguntasContainer.innerHTML = "";
+    preguntas.forEach((pregunta, index) => {
+      const preguntaDiv = document.createElement("div");
+      preguntaDiv.classList.add("pregunta");
+      preguntaDiv.innerHTML = `
+        <label for="respuesta-${index}">Pregunta ${index + 1}:</label>
+        <p>${pregunta.pregunta}</p>
+        <input type="text" placeholder="Respuesta" id="respuesta-${index}" class="respuesta-input">
+      `;
+      preguntasContainer.appendChild(preguntaDiv);
+    });
+  }
+
+  function mostrarFormulario() {
+    document.getElementById("formulario-container").style.display = "block";
+    document.getElementById("calificacion-container").style.display = "none";
+  }
+
+  function mostrarCalificacion() {
+    const respuestasUsuario = [];
+    preguntas.forEach((pregunta, index) => {
+      const respuestaUsuario = document.getElementById(`respuesta-${index}`).value;
+      respuestasUsuario.push(respuestaUsuario);
+    });
+    const puntuacionTotal = calcularPuntuacion(respuestasUsuario);
+    document.getElementById("calificacion-container").style.display = "block";
+    document.getElementById("puntuacion-total").textContent = `Puntuación Total: ${puntuacionTotal}`;
+    document.getElementById("formulario-container").style.display = "none";
+  }
+
+  function volverACalificar() {
+    document.getElementById("calificacion-container").style.display = "none";
+    document.getElementById("formulario-container").style.display = "block";
+  }
+
+  function calcularPuntuacion(respuestasUsuario) {
+    let puntuacionTotal = 0;
+    preguntas.forEach((pregunta, index) => {
+      const respuestaEsperada = pregunta.respuesta;
+      const respuestaUsuario = respuestasUsuario[index];
+      if (respuestaUsuario === respuestaEsperada) {
+        puntuacionTotal += pregunta.ponderacion;
+      }
+    });
+    return puntuacionTotal;
+  }
+</script>
+
+</body>
+</html>
